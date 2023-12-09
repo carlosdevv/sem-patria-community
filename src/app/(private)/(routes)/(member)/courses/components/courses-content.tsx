@@ -62,7 +62,7 @@ const CoursesContent = ({ categories }: CoursesContentProps) => {
         ))}
       </div>
 
-      <div className="grid grid-cols-5 gap-x-6 gap-y-9 mt-6">
+      <div className="grid grid-cols-4 2xl:grid-cols-5 gap-x-6 gap-y-9 mt-6">
         {isLoading && <SkeletonCourseCards />}
         {coursesList &&
           coursesList.data.length > 0 &&
@@ -72,7 +72,7 @@ const CoursesContent = ({ categories }: CoursesContentProps) => {
               key={course.id}
               className="flex flex-col gap-2 p-3 h-full overflow-hidden rounded-lg hover:bg-muted cursor-pointer transition-all ease-in"
             >
-              <div className="aspect-video w-64 h-36 rounded-md">
+              <div className="aspect-video w-full rounded-md">
                 <AspectRatio ratio={16 / 9}>
                   <div className="bg-gradient bg-gradient-to-r dark:from-[#ECE9E6] dark:to-[#FFFFFF] from-[#141E30] to-[#243B55] w-full h-full rounded-md object-cover" />
                 </AspectRatio>
