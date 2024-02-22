@@ -3,17 +3,16 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import * as React from 'react'
-
 import appLogo from '@/assets/logo.svg'
 import { Icons } from '@/components/icons'
 import { useAppStore } from '@/hooks/use-app-store'
 import { appRoutes } from '@/lib/constants'
-import { RouteProps } from '@/lib/types'
+import { type RouteProps } from '@/lib/types'
 import { cn } from '@/lib/utils'
-import { UserButton, useUser } from '@clerk/nextjs'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { SkeletonMainNav } from './components/skeleton-main-nav'
+import ClerkUserButton from '../clerk-user-button'
 
 type MainNavProps = {
   children?: React.ReactNode
@@ -21,9 +20,9 @@ type MainNavProps = {
 
 const MainNav = ({ children }: MainNavProps) => {
   const [isMounted, setIsMounted] = useState(false)
-  const { user } = useUser()
   const pathname = usePathname()
   const { isCmsMode } = useAppStore()
+  const isAdminPage = pathname.includes('admin')
 
   const memberRoutes: RouteProps[] = [
     {
@@ -37,6 +36,18 @@ const MainNav = ({ children }: MainNavProps) => {
       label: 'Courses',
       active: pathname === appRoutes.courses,
       icon: <Icons.code className="h-4 w-4" />
+    },
+    {
+      href: `${appRoutes.codeUp}`,
+      label: 'Code Up',
+      active: pathname === appRoutes.codeUp,
+      icon: <Icons.calendar className="h-4 w-4" />
+    },
+    {
+      href: `${appRoutes.mentorship}`,
+      label: 'Mentorship',
+      active: pathname === appRoutes.mentorship,
+      icon: <Icons.mentorship className="h-4 w-4" />
     },
     {
       href: appRoutes.settings,
@@ -58,6 +69,12 @@ const MainNav = ({ children }: MainNavProps) => {
       label: 'Categories',
       active: pathname.includes(appRoutes.admin_categories),
       icon: <Icons.layers className="h-4 w-4" />
+    },
+    {
+      href: appRoutes.admin_events,
+      label: 'Events',
+      active: pathname.includes(appRoutes.admin_events),
+      icon: <Icons.calendarDays className="h-4 w-4" />
     }
   ]
 
@@ -68,7 +85,12 @@ const MainNav = ({ children }: MainNavProps) => {
   if (!isMounted) return <SkeletonMainNav />
 
   return (
-    <div className="hidden h-screen w-[250px] flex-shrink-0 flex-col justify-between border-r border-slate-6 px-4 pb-6 md:flex">
+    <div
+      className={cn(
+        'hidden  h-screen w-[250px] flex-shrink-0 flex-col justify-between border-r border-slate-6 px-4 pb-6 ',
+        isAdminPage ? 'lg:flex' : 'md:flex'
+      )}
+    >
       <div className="flex h-[60px] items-center">
         <Link
           href={appRoutes.dashboard}
@@ -124,12 +146,7 @@ const MainNav = ({ children }: MainNavProps) => {
           )}
         </ul>
       </nav>
-      <div className="flex items-center gap-x-2">
-        <UserButton afterSignOutUrl={appRoutes.signIn} />
-        <span className="truncate font-bold text-muted-foreground text-sm">
-          {user?.fullName || ''}
-        </span>
-      </div>
+      <ClerkUserButton />
     </div>
   )
 }
