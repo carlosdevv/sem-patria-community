@@ -1,10 +1,11 @@
 'use client'
 
-import { Category } from '@prisma/client'
-import { ColumnDef } from '@tanstack/react-table'
-import { CourseCellAction } from './course-cell-action'
 import { Badge } from '@/components/ui/badge'
-import { validateCourseLevelColor } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { validateCourseLevelColor, validateIsPendingColor } from '@/lib/utils'
+import { type ColumnDef } from '@tanstack/react-table'
+import { CourseCellAction } from './course-cell-action'
+import { Icons } from '@/components/icons'
 
 export type CourseColumn = {
   id: string
@@ -13,16 +14,30 @@ export type CourseColumn = {
   level: string
   category: string
   isPaid: boolean
+  isPending: boolean
+  categoryId?: string
 }
 
-export const columns: ColumnDef<CourseColumn>[] = [
+export const columns: Array<ColumnDef<CourseColumn>> = [
   {
     accessorKey: 'name',
     header: 'Name'
   },
   {
     accessorKey: 'category',
-    header: 'Category',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => {
+            column.toggleSorting(column.getIsSorted() === 'asc')
+          }}
+        >
+          Category
+          <Icons.arrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
     cell: ({ row }) => (
       <span>
         {row.original.category.charAt(0).toUpperCase() +
@@ -36,21 +51,56 @@ export const columns: ColumnDef<CourseColumn>[] = [
   },
   {
     accessorKey: 'level',
-    header: 'Level',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => {
+            column.toggleSorting(column.getIsSorted() === 'asc')
+          }}
+        >
+          Level
+          <Icons.arrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
     cell: ({ row }) => (
       <Badge className={`${validateCourseLevelColor(row.original.level)}`}>
         {row.original.level}
       </Badge>
     )
   },
-
   {
     accessorKey: 'isPaid',
     header: 'Paid',
     cell: ({ row }) => <span>{row.original.isPaid ? 'Paid' : 'Free'}</span>
   },
   {
+    accessorKey: 'isPending',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => {
+            column.toggleSorting(column.getIsSorted() === 'asc')
+          }}
+        >
+          Pending
+          <Icons.arrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+    cell: ({ row }) => {
+      const { background, text } = validateIsPendingColor(
+        row.original.isPending
+      )
+
+      return <Badge className={`${background}`}>{text}</Badge>
+    }
+  },
+  {
     id: 'actions',
+    header: 'Actions',
     cell: ({ row }) => <CourseCellAction data={row.original} />
   }
 ]
